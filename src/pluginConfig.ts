@@ -11,7 +11,7 @@ const config: ExternalPluginConfig = {
     desktopUI: 'rhpane',
     mobileUI: 'fullscreen',
     routerPath: '/astronomy-seeing',
-    private: true,
+    private: false,
 };
 
 export default config;
