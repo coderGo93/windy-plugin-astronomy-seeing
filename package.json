@@ -1,6 +1,6 @@
 {
     "name": "windy-plugin-astronomy-seeing",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Professional astrophotography decision-making engine based on atmospheric and astronomical conditions",
     "main": "dist/plugin.min.js",
     "type": "module",

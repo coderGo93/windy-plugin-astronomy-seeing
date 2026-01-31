@@ -124,18 +124,18 @@
                     imagingMode = 'planetary';
                 }}
             >
-                Planetary
+                {t('planetary')}
             </button>
         </div>
 
         <!-- DSO Sub-category (only show when DSO mode is selected) -->
         {#if imagingMode === 'dso'}
             <div class="dso-subcategory">
-                <label for="dsoType">DSO Type:</label>
+                <label for="dsoType">{t('dsoType')}:</label>
                 <select id="dsoType" bind:value={dsoType}>
-                    <option value="galaxy">Galaxies</option>
-                    <option value="nebula">Nebulae (with filters)</option>
-                    <option value="cluster">Star Clusters</option>
+                    <option value="galaxy">{t('galaxies')}</option>
+                    <option value="nebula">{t('nebulae')}</option>
+                    <option value="cluster">{t('starClusters')}</option>
                 </select>
             </div>
         {/if}
@@ -144,7 +144,8 @@
         <div class="focal-length-section" style="margin-bottom: 5px;">
             <!-- Focal Length -->
             <div class="slider-row">
-                <label for="focalLength">Focal Length: <strong>{focalLength}mm</strong></label>
+                <label for="focalLength">{t('focalLength')}: <strong>{focalLength}mm</strong></label
+                >
                 <input
                     type="range"
                     id="focalLength"
@@ -156,7 +157,7 @@
             </div>
             <!-- Pixel Size -->
             <div class="slider-row" style="margin-top:5px;">
-                <label for="pixelSize">Pixel Size: <strong>{pixelSize}µm</strong></label>
+                <label for="pixelSize">{t('pixelSizeLabel')}: <strong>{pixelSize}µm</strong></label>
                 <input
                     type="range"
                     id="pixelSize"
@@ -168,7 +169,7 @@
             </div>
             <!-- Aperture -->
             <div class="slider-row" style="margin-top:5px;">
-                <label for="aperture">Aperture: <strong>{aperture}mm</strong></label>
+                <label for="aperture">{t('apertureLabel')}: <strong>{aperture}mm</strong></label>
                 <input
                     type="range"
                     id="aperture"
@@ -183,7 +184,8 @@
             <div
                 style="font-size: 0.85em; opacity: 0.9; margin-top: 5px; text-align: right; color: #ffd700;"
             >
-                Resolution: <strong>{((206.265 * pixelSize) / focalLength).toFixed(2)}"/px</strong>
+                {t('resolution')}:
+                <strong>{((206.265 * pixelSize) / focalLength).toFixed(2)}"/px</strong>
             </div>
         </div>
 
@@ -210,25 +212,25 @@
         <!-- Metrics Grid -->
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-label">Seeing</div>
+                <div class="metric-label">{t('seeing')}</div>
                 <div class="metric-value {getSeeingClass(seeingScore)}">
                     {Math.round(seeingScore)}%
                 </div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Transparency</div>
+                <div class="metric-label">{t('transparency')}</div>
                 <div class="metric-value {getTransparencyClass(transparencyScore)}">
                     {Math.round(transparencyScore)}%
                 </div>
             </div>
             <div class="metric-card">
-                <div class="metric-label">Dark Sky</div>
+                <div class="metric-label">{t('darkSky')}</div>
                 <div class="metric-value {getDarkSkyClass(isDarkSky)}">
                     {isDarkSky ? t('yes') : t('no')}
                 </div>
             </div>
             <div class="metric-card {dewRisk === 'critical' ? 'dew-warning' : ''}">
-                <div class="metric-label">Dew Risk</div>
+                <div class="metric-label">{t('dewRisk')}</div>
                 <div class="metric-value">{dewRisk === 'critical' ? t('critical') : t('low')}</div>
             </div>
         </div>
@@ -236,7 +238,8 @@
         <!-- Advanced Diagnostics Toggle -->
         <div class="diagnostics-toggle">
             <button class="toggle-btn" on:click={() => (showDiagnostics = !showDiagnostics)}>
-                {showDiagnostics ? '▼' : '▶'} Advanced Diagnostics
+                {showDiagnostics ? '▼' : '▶'}
+                {t('advancedDiagnostics')}
             </button>
         </div>
 
@@ -250,26 +253,22 @@
                         class="diag-header"
                         on:click={() => (showLocationHelp = !showLocationHelp)}
                     >
-                        <span>📍 Location & Time</span>
+                        <span>📍 {t('locationTime')}</span>
                         <span>{showLocationHelp ? '▼' : '▶'}</span>
                     </div>
 
                     {#if showLocationHelp}
                         <div class="help-glossary">
-                            <div class="help-item">
-                                <strong>Coordinates:</strong> Precise location for forecast.
-                            </div>
-                            <div class="help-item">
-                                <strong>Time:</strong> Local and UTC time reference.
-                            </div>
+                            <div class="help-item">{t('glossaryCoords')}</div>
+                            <div class="help-item">{t('glossaryTime')}</div>
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Coordinates:</span>
+                        <span>{t('coordinates')}:</span>
                         <span>{currentLat.toFixed(3)}°, {currentLon.toFixed(3)}°</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Local Time:</span>
+                        <span>{t('localTime')}:</span>
                         <span
                             >{currentTime.toLocaleString('es-ES', {
                                 year: 'numeric',
@@ -281,7 +280,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>UTC Time:</span>
+                        <span>{t('utcTime')}:</span>
                         <span>{currentTime.toISOString().substring(11, 19)} UTC</span>
                     </div>
                 </div>
@@ -289,7 +288,7 @@
                 <!-- Astronomical Conditions -->
                 <div class="diag-section">
                     <div class="diag-header" on:click={() => (showAstroHelp = !showAstroHelp)}>
-                        <span>🌙 Astronomical Conditions</span>
+                        <span>🌙 {t('astronomicalConditions')}</span>
                         <span>{showAstroHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -628,7 +627,7 @@
                         class="diag-header"
                         on:click={() => (showEquipmentHelp = !showEquipmentHelp)}
                     >
-                        <span>🔭 Equipment Recommendations</span>
+                        <span>🔭 {t('equipmentRecommendations')}</span>
                         <span>{showEquipmentHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -641,23 +640,23 @@
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Dew Heater:</span>
+                        <span>{t('dewHeater')}:</span>
                         <span class={dewRisk === 'critical' ? 'poor-value' : 'good-value'}
                             >{dewRisk === 'critical' ? t('required') : t('recommended')}</span
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Autoguiding:</span>
+                        <span>{t('autoguiding')}:</span>
                         <span class={windSpeed250 > 40 ? 'poor-value' : 'good-value'}
                             >{windSpeed250 > 40 ? t('essential') : t('standardOk')}</span
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Exposure Time:</span>
+                        <span>{t('exposureTime')}:</span>
                         <span>{getRecommendedExposure(windSpeed250, focalLength)}</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Optimal FL Range:</span>
+                        <span>{t('optimalFLRange')}:</span>
                         <span>{getOptimalFocalLength(windSpeed250)}</span>
                     </div>
                 </div>
@@ -665,7 +664,7 @@
                 <!-- Current Scores Breakdown -->
                 <div class="diag-section">
                     <div class="diag-header" on:click={() => (showScoreHelp = !showScoreHelp)}>
-                        <span>📊 Score Breakdown</span>
+                        <span>📊 {t('scoreBreakdown')}</span>
                         <span>{showScoreHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -676,21 +675,21 @@
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Seeing Score:</span>
+                        <span>{t('seeingScore')}:</span>
                         <span class={getSeeingClass(seeingScore)}>{Math.round(seeingScore)}%</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Transparency Score:</span>
+                        <span>{t('transparencyScore')}:</span>
                         <span class={getTransparencyClass(transparencyScore)}
                             >{Math.round(transparencyScore)}%</span
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Moon Impact:</span>
+                        <span>{t('moonImpact')}:</span>
                         <span>{getMoonImpact()}%</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Overall Score:</span>
+                        <span>{t('overallScore')}:</span>
                         <span class={getStatusClass(overallScore)}>{Math.round(overallScore)}%</span
                         >
                     </div>
@@ -701,14 +700,13 @@
         <!-- Hourly Forecast Toggle -->
         <div class="hourly-toggle">
             <button class="toggle-btn" on:click={() => (showHourly = !showHourly)}>
-                {showHourly ? '▼' : '▶'} Next 24 Hours - from {currentTime.toLocaleDateString(
-                    'es-ES',
-                    {
-                        weekday: 'short',
-                        day: '2-digit',
-                        month: '2-digit',
-                    },
-                )}
+                {showHourly ? '▼' : '▶'}
+                {t('next24Hours')} - {t('from')}
+                {currentTime.toLocaleDateString('es-ES', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: '2-digit',
+                })}
                 {currentTime.toLocaleTimeString('es-ES', {
                     hour: '2-digit',
                     minute: '2-digit',
@@ -720,10 +718,10 @@
         {#if showHourly}
             <div class="hourly-panel">
                 <div class="hourly-header">
-                    <span>Time (Local)</span>
-                    <span>Score</span>
-                    <span>Status</span>
-                    <span>Sun/Moon</span>
+                    <span>{t('timeLocal')}</span>
+                    <span>{t('score')}</span>
+                    <span>{t('status')}</span>
+                    <span>{t('sunMoon')}</span>
                 </div>
                 {#each hourlyData as hour, index}
                     <div class="hourly-row {hour.isGoodViewing ? 'good-hour' : 'poor-hour'}">
@@ -738,8 +736,8 @@
                         <span class="hourly-status">{hour.status}</span>
                         <span class="hourly-conditions">
                             <small>
-                                S: {hour.sunAlt.toFixed(0)}°<br />
-                                M: {hour.moonAlt.toFixed(0)}°
+                                {t('sun')}: {hour.sunAlt.toFixed(0)}°<br />
+                                {t('moonAbbr')}: {hour.moonAlt.toFixed(0)}°
                             </small>
                         </span>
                     </div>
@@ -750,7 +748,8 @@
         <!-- Multi-day Forecast Toggle -->
         <div class="forecast-toggle">
             <button class="toggle-btn" on:click={() => (showForecast = !showForecast)}>
-                {showForecast ? '▼' : '▶'} 7-Day Forecast
+                {showForecast ? '▼' : '▶'}
+                {t('sevenDayForecast')}
             </button>
         </div>
 
@@ -758,10 +757,10 @@
         {#if showForecast}
             <div class="forecast-panel">
                 <div class="forecast-header">
-                    <span>Date</span>
-                    <span>Score</span>
-                    <span>Moon</span>
-                    <span>Viewing Window</span>
+                    <span>{t('date')}</span>
+                    <span>{t('score')}</span>
+                    <span>{t('moon')}</span>
+                    <span>{t('viewingWindow')}</span>
                 </div>
                 {#each forecastData as day, index}
                     <div
@@ -776,13 +775,13 @@
                         <span class="forecast-moon">{(day.moonIllum * 100).toFixed(0)}%</span>
                         <span class="forecast-window">
                             {#if day.viewingWindow}
-                                {day.viewingWindow.start}-{day.viewingWindow.end}<br />
+                                {day.viewingWindow.start}<br />
                                 <small class="window-info"
-                                    >({day.viewingWindow.duration}, best: {day.viewingWindow
+                                    >({day.viewingWindow.duration}, {t('best')}: {day.viewingWindow
                                         .bestHour})</small
                                 >
                             {:else}
-                                <span class="no-window">No good window</span>
+                                <span class="no-window">'{t('noGoodWindow')}'</span>
                             {/if}
                         </span>
                     </div>
@@ -928,8 +927,112 @@
                 'Max Exposure: Limited by wind stability. High winds shake equipment.',
             glossaryOptFL:
                 'Optimal FL: High turbulence limits resolution. Use shorter focal lengths in poor seeing.',
+            // UI Labels
+            dsoType: 'DSO Type',
+            galaxies: 'Galaxies',
+            nebulae: 'Nebulae (with filters)',
+            starClusters: 'Star Clusters',
+            focalLength: 'Focal Length',
+            pixelSizeLabel: 'Pixel Size',
+            apertureLabel: 'Aperture',
+            resolution: 'Resolution',
+            viewingWindow: 'Viewing Window',
+            noGoodWindow: 'No good window',
+            planetary: 'Planetary',
+            date: 'Date',
+            score: 'Score',
+            moon: 'Moon',
+            hourlyForecast: 'Hourly Forecast',
+            sevenDayForecast: '7-Day Forecast',
+            timeLocal: 'Time (Local)',
+            status: 'Status',
+            sunMoon: 'Sun/Moon',
+            // More UI Labels
+            seeing: 'Seeing',
+            transparency: 'Transparency',
+            darkSky: 'Dark Sky',
+            dewRisk: 'Dew Risk',
+            advancedDiagnostics: 'Advanced Diagnostics',
+            locationTime: 'Location & Time',
+            coordinates: 'Coordinates',
+            localTime: 'Local Time',
+            exposureTime: 'Exposure Time',
+            optimalFLRange: 'Optimal FL Range',
+            atmosphericConditions: 'Atmospheric Conditions',
+            astronomicalConditions: 'Astronomical Conditions',
+            airQuality: 'Air Quality',
+            best: 'best',
+            // More labels
+            scoreBreakdown: 'Score Breakdown',
+            seeingScore: 'Seeing Score',
+            transparencyScore: 'Transparency Score',
+            moonImpact: 'Moon Impact',
+            overallScore: 'Overall Score',
+            next24Hours: 'Next 24 Hours',
+            equipmentSetup: 'Equipment Setup',
+            guidingRequired: 'Guiding Required',
+            // Equipment labels
+            equipmentRecommendations: 'Equipment Recommendations',
+            dewHeater: 'Dew Heater',
+            autoguiding: 'Autoguiding',
+            from: 'from',
+            utcTime: 'UTC Time',
+            sun: 'Sun',
+            moonAbbr: 'Moon',
         },
         es: {
+            // UI Labels
+            dsoType: 'Tipo DSO',
+            galaxies: 'Galaxias',
+            nebulae: 'Nebulosas (con filtros)',
+            starClusters: 'Cúmulos Estelares',
+            focalLength: 'Distancia Focal',
+            pixelSizeLabel: 'Tamaño de Píxel',
+            apertureLabel: 'Apertura',
+            resolution: 'Resolución',
+            viewingWindow: 'Ventana de Observación',
+            noGoodWindow: 'Sin ventana buena',
+            planetary: 'Planetario',
+            date: 'Fecha',
+            score: 'Puntaje',
+            moon: 'Luna',
+            hourlyForecast: 'Pronóstico por Hora',
+            sevenDayForecast: 'Pronóstico 7 Días',
+            timeLocal: 'Hora (Local)',
+            status: 'Estado',
+            sunMoon: 'Sol/Luna',
+            // More UI Labels
+            seeing: 'Seeing',
+            transparency: 'Transparencia',
+            darkSky: 'Cielo Oscuro',
+            dewRisk: 'Riesgo de Rocío',
+            advancedDiagnostics: 'Diagnósticos Avanzados',
+            locationTime: 'Ubicación y Hora',
+            coordinates: 'Coordenadas',
+            localTime: 'Hora Local',
+            exposureTime: 'Tiempo de Exposición',
+            optimalFLRange: 'Rango DF Óptimo',
+            atmosphericConditions: 'Condiciones Atmosféricas',
+            astronomicalConditions: 'Condiciones Astronómicas',
+            airQuality: 'Calidad del Aire',
+            best: 'mejor',
+            // More labels
+            scoreBreakdown: 'Desglose de Puntaje',
+            seeingScore: 'Puntaje Seeing',
+            transparencyScore: 'Puntaje Transparencia',
+            moonImpact: 'Impacto Lunar',
+            overallScore: 'Puntaje General',
+            next24Hours: 'Próximas 24 Horas',
+            equipmentSetup: 'Configuración de Equipo',
+            guidingRequired: 'Guiado Requerido',
+            // Equipment labels
+            equipmentRecommendations: 'Recomendaciones de Equipo',
+            dewHeater: 'Calentador de Rocío',
+            autoguiding: 'Autoguiado',
+            from: 'desde',
+            utcTime: 'Hora UTC',
+            sun: 'Sol',
+            moonAbbr: 'Luna',
             glossaryExposure: 'Exp. Max: Limitada por viento. Vientos fuertes mueven el equipo.',
             glossaryOptFL:
                 'DF Óptima: Turbulencia limita resolución. Usa DF más corta con mal seeing.',
@@ -1746,16 +1849,31 @@
         duration: string;
         bestHour: string;
     } | null {
-        const scores: Array<{ hour: number; score: number; time: Date }> = [];
+        // Get sun times using SunCalc - FULL NIGHT from sunset to sunrise
+        const sunTimes = SunCalc.getTimes(date, currentLat, currentLon);
+        const nextDay = new Date(date);
+        nextDay.setDate(nextDay.getDate() + 1);
+        const nextSunTimes = SunCalc.getTimes(nextDay, currentLat, currentLon);
 
-        // For 7-day forecast, still check the full day (00:00 to 23:00)
-        // This gives a complete picture of the viewing window for trip planning
-        for (let hour = 0; hour < 24; hour++) {
-            const testTime = new Date(date);
-            testTime.setHours(hour, 0, 0, 0);
+        // Full observing session: from sunset to sunrise next day
+        const nightStart = sunTimes.sunset;
+        const nightEnd = nextSunTimes.sunrise;
 
-            const score = calculateHourlyScoreForTime(testTime);
-            scores.push({ hour, score, time: testTime });
+        // Handle polar regions or invalid times
+        if (!nightStart || !nightEnd || isNaN(nightStart.getTime()) || isNaN(nightEnd.getTime())) {
+            return null;
+        }
+
+        const scores: Array<{ time: Date; score: number }> = [];
+
+        // Sample every hour from nightStart to nightEnd
+        let currentHour = new Date(nightStart);
+        currentHour.setMinutes(0, 0, 0); // Round to hour
+
+        while (currentHour <= nightEnd) {
+            const score = calculateHourlyScoreForTime(currentHour);
+            scores.push({ time: new Date(currentHour), score });
+            currentHour.setHours(currentHour.getHours() + 1);
         }
 
         // Find continuous good periods (score >= 40)
@@ -1763,48 +1881,61 @@
 
         if (goodHours.length === 0) return null;
 
-        // Find the longest continuous period
-        let bestStart = goodHours[0];
-        let bestEnd = goodHours[0];
-        let bestScore = goodHours[0].score;
-        let longestDuration = 1;
-
-        let currentStart = goodHours[0];
-        let currentDuration = 1;
+        // Find ALL continuous windows (not just the longest)
+        const windows: Array<{ start: Date; end: Date; duration: number }> = [];
+        let windowStart = goodHours[0].time;
+        let windowEnd = goodHours[0].time;
 
         for (let i = 1; i < goodHours.length; i++) {
-            if (goodHours[i].hour === goodHours[i - 1].hour + 1) {
-                // Continue current streak
-                currentDuration++;
+            const prevTime = goodHours[i - 1].time.getTime();
+            const currTime = goodHours[i].time.getTime();
+            const hourDiff = (currTime - prevTime) / (1000 * 60 * 60);
+
+            if (hourDiff <= 1.5) {
+                // Continue current window
+                windowEnd = goodHours[i].time;
             } else {
-                // New streak - check if previous was longer
-                if (currentDuration > longestDuration) {
-                    longestDuration = currentDuration;
-                    bestStart = currentStart;
-                    bestEnd = goodHours[i - 1];
-                }
-                currentStart = goodHours[i];
-                currentDuration = 1;
+                // Save current window and start new one
+                const duration =
+                    Math.round((windowEnd.getTime() - windowStart.getTime()) / (1000 * 60 * 60)) +
+                    1;
+                windows.push({ start: windowStart, end: windowEnd, duration });
+                windowStart = goodHours[i].time;
+                windowEnd = goodHours[i].time;
             }
         }
 
-        // Check final streak
-        if (currentDuration > longestDuration) {
-            bestStart = currentStart;
-            bestEnd = goodHours[goodHours.length - 1];
-            longestDuration = currentDuration;
-        }
+        // Don't forget the last window
+        const lastDuration =
+            Math.round((windowEnd.getTime() - windowStart.getTime()) / (1000 * 60 * 60)) + 1;
+        windows.push({ start: windowStart, end: windowEnd, duration: lastDuration });
 
-        // Find the best single hour within the window
-        const bestHourData = scores.reduce((best, current) =>
+        // Find best hour across ALL windows
+        const bestHourData = goodHours.reduce((best, current) =>
             current.score > best.score ? current : best,
         );
 
+        // Format time with minutes (HH:MM)
+        const formatTime = (d: Date) => {
+            const h = d.getHours();
+            const m = d.getMinutes();
+            return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+        };
+
+        // Build comma-separated window string
+        const windowStrings = windows.map(w => {
+            const endTime = new Date(w.end.getTime() + 60 * 60 * 1000); // Add 1h to get end of last good hour
+            return `${formatTime(w.start)}-${formatTime(endTime)}`;
+        });
+
+        // Calculate total duration across all windows
+        const totalDuration = windows.reduce((sum, w) => sum + w.duration, 0);
+
         return {
-            start: String(bestStart.hour).padStart(2, '0') + ':00',
-            end: String(bestEnd.hour + 1).padStart(2, '0') + ':00',
-            duration: `${longestDuration}h`,
-            bestHour: String(bestHourData.hour).padStart(2, '0') + ':00',
+            start: windowStrings.join(', '),
+            end: '', // Not needed anymore, included in start
+            duration: `${totalDuration}h`,
+            bestHour: formatTime(bestHourData.time),
         };
     }
 

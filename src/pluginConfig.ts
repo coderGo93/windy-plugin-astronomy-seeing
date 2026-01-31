@@ -2,7 +2,7 @@ import type { ExternalPluginConfig } from '@windy/interfaces';
 
 const config: ExternalPluginConfig = {
     name: 'windy-plugin-astronomy-seeing',
-    version: '1.0.0',
+    version: '1.1.0',
     icon: '🔭',
     title: 'Astro Seeing & Transparency',
     description: 'Professional astrophotography decision-making engine based on atmospheric and astronomical conditions.',
