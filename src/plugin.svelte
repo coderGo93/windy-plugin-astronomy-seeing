@@ -1574,7 +1574,25 @@
         return metrics.wind.metric;
     }
 
-    function detectLanguageFromBrowser(): 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' {
+    function detectLanguage(): 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' {
+        // First try to get language from Windy's store
+        try {
+            if (store && store.get) {
+                const windyLang = store.get('lang') as string;
+                if (windyLang) {
+                    if (windyLang.startsWith('es')) return 'es';
+                    if (windyLang.startsWith('fr')) return 'fr';
+                    if (windyLang.startsWith('de')) return 'de';
+                    if (windyLang.startsWith('it')) return 'it';
+                    if (windyLang.startsWith('pt')) return 'pt';
+                    if (windyLang.startsWith('en')) return 'en';
+                }
+            }
+        } catch (e) {
+            // Fallback to browser language
+        }
+
+        // Fallback to browser language
         const locale = navigator.language || 'en-US';
         if (locale.startsWith('es')) return 'es';
         if (locale.startsWith('fr')) return 'fr';
@@ -1589,9 +1607,8 @@
     }
 
     function updateUnitsFromWindy() {
-        // Detect language first
-        currentLanguage = detectLanguageFromBrowser();
-        console.log('Detected language:', currentLanguage);
+        // Detect language from Windy settings
+        currentLanguage = detectLanguage();
 
         try {
             if (store && store.get) {
