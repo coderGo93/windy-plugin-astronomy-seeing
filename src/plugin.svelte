@@ -79,6 +79,10 @@
                             <strong>⏰ Windows:</strong>
                             {t('helpWindows')}
                         </div>
+                        <div class="help-item">
+                            <strong>↗↘→ {t('trend')}:</strong>
+                            {t('helpTrend')}
+                        </div>
 
                         <div
                             class="help-item help-about"
@@ -195,6 +199,16 @@
                 <div class="gauge-fill" style="--percentage: {overallScore}"></div>
                 <div class="gauge-content">
                     <div class="score-number">{Math.round(overallScore)}%</div>
+                    <!-- Simple trend indicator -->
+                    <div class="trend-simple {currentTrend}">
+                        {#if currentTrend === 'improving'}
+                            ↗ {t('improving')}
+                        {:else if currentTrend === 'worsening'}
+                            ↘ {t('worsening')}
+                        {:else}
+                            → {t('stable')}
+                        {/if}
+                    </div>
                     <div class="astro-status {getStatusClass(overallScore)}">
                         {getStatusText(overallScore)}
                     </div>
@@ -731,8 +745,13 @@
                                 ? 'good-value'
                                 : hour.score >= 40
                                   ? 'fair-value'
-                                  : 'poor-value'}">{hour.score}%</span
+                                  : 'poor-value'}"
                         >
+                            {hour.score}%
+                            <span class="hourly-trend {hour.trend}">
+                                {#if hour.trend === 'up'}↗{:else if hour.trend === 'down'}↘{:else}→{/if}
+                            </span>
+                        </span>
                         <span class="hourly-status">{hour.status}</span>
                         <span class="hourly-conditions">
                             <small>
@@ -883,6 +902,8 @@
             helpFocalLength:
                 'Focal Length: Longer focal lengths are more sensitive to poor seeing. Adjust exposure times and autoguiding based on conditions.',
             helpWindows: 'Best observing times (Score > 70).',
+            helpTrend:
+                'Shows if conditions are improving (↗), worsening (↘), or stable (→) over the next 2 hours based on real forecast data.',
             // Glossary & Help Strings
             glossaryCoords: 'Coordinates: Precise location for forecast.',
             glossaryTime: 'Time: Local and UTC time reference.',
@@ -947,6 +968,7 @@
             timeLocal: 'Time (Local)',
             status: 'Status',
             sunMoon: 'Sun/Moon',
+            now: 'Now',
             // More UI Labels
             seeing: 'Seeing',
             transparency: 'Transparency',
@@ -979,6 +1001,15 @@
             utcTime: 'UTC Time',
             sun: 'Sun',
             moonAbbr: 'Moon',
+            // New: Trend & Best Nearby indicators
+            bestNearby: 'Best Nearby',
+            trend: 'Trend',
+            improving: 'Improving',
+            worsening: 'Worsening',
+            stable: 'Stable',
+            at: 'at',
+            in3Hours: 'In next 3h',
+            feelsLike: 'Potential',
         },
         es: {
             // UI Labels
@@ -1001,6 +1032,7 @@
             timeLocal: 'Hora (Local)',
             status: 'Estado',
             sunMoon: 'Sol/Luna',
+            now: 'Ahora',
             // More UI Labels
             seeing: 'Seeing',
             transparency: 'Transparencia',
@@ -1033,6 +1065,15 @@
             utcTime: 'Hora UTC',
             sun: 'Sol',
             moonAbbr: 'Luna',
+            // New: Trend & Best Nearby indicators
+            bestNearby: 'Mejor Cercana',
+            trend: 'Tendencia',
+            improving: 'Mejorando',
+            worsening: 'Empeorando',
+            stable: 'Estable',
+            at: 'a las',
+            in3Hours: 'En próximas 3h',
+            feelsLike: 'Potencial',
             glossaryExposure: 'Exp. Max: Limitada por viento. Vientos fuertes mueven el equipo.',
             glossaryOptFL:
                 'DF Óptima: Turbulencia limita resolución. Usa DF más corta con mal seeing.',
@@ -1089,6 +1130,8 @@
                 'Distancia Focal: Distancias focales largas son más sensibles al mal seeing. Ajusta tiempos de exposición y autoguiado según condiciones.',
             helpWindows:
                 'Ventanas de Observación: Muestran períodos óptimos con horarios de inicio/fin, duración y hora pico. Barras verdes indican períodos buenos.',
+            helpTrend:
+                'Muestra si las condiciones están mejorando (↗), empeorando (↘), o estables (→) en las próximas 2 horas basado en datos reales del pronóstico.',
         },
         fr: {
             excellent: 'EXCELLENT',
@@ -1262,6 +1305,16 @@
         lon: number;
     } | null = null;
 
+    // Cache for direct cloud data from PointForecast (lclouds, mclouds, hclouds)
+    let cloudDataCache: {
+        ts: number[];
+        lclouds: number[];
+        mclouds: number[];
+        hclouds: number[];
+        lat: number;
+        lon: number;
+    } | null = null;
+
     // Astronomical data
     let moonAltitude = 0;
     let moonIllumination = 0;
@@ -1303,7 +1356,11 @@
         sunAlt: number;
         moonAlt: number;
         isGoodViewing: boolean;
+        trend: 'up' | 'down' | 'stable'; // Trend indicator based on adjacent hours
     }> = [];
+
+    // Trend indicator - calculated from real forecast data
+    let currentTrend: 'improving' | 'worsening' | 'stable' = 'stable';
 
     let showHourly = false;
     let showHelp = false;
@@ -1389,6 +1446,7 @@
         pwv: number = 0,
         aod: number = 0,
         pm25: number = 0,
+        dustMass: number = -1, // µg/m³ from CAMS chemsDustsm
     ): number {
         // 1. Clouds (Weighted) - High clouds scatter light most
         const cloudPenalty = highClouds * 0.8 + midClouds * 0.6 + lowClouds * 0.4;
@@ -1421,7 +1479,16 @@
             pmPenalty = Math.min(20, (pm25 - 5) * 0.5);
         }
 
-        let score = 100 - cloudPenalty - rhPenalty - pwvPenalty - aodPenalty - pmPenalty;
+        // 6. Dust Mass (from CAMS chemsDustsm) - µg/m³
+        // Values typically range 0.5-5+ µg/m³
+        // < 1 Excellent, > 3 Poor for astronomy
+        let dustPenalty = 0;
+        if (dustMass > 0 && dustMass > 1) {
+            dustPenalty = Math.min(15, (dustMass - 1) * 4);
+        }
+
+        let score =
+            100 - cloudPenalty - rhPenalty - pwvPenalty - aodPenalty - pmPenalty - dustPenalty;
         return Math.max(0, score);
     }
 
@@ -1429,12 +1496,24 @@
         let score = 100;
         let reasons: string[] = [];
 
-        // 1. Sun Altitude (Critical)
-        if (sunAltitude > -12) {
-            return 5; // Stay Home (Daytime)
+        // 1. Sun Altitude - IMPROVED: Smooth sigmoid transition instead of hard cutoff
+        // This provides a gradual penalty as the sky gets brighter, which is more realistic
+        // The sigmoid curve models how sky brightness actually transitions during twilight
+        if (sunAltitude > 0) {
+            // Daytime - full penalty
+            return 5;
         } else if (sunAltitude > -18) {
-            score -= (sunAltitude + 18) * 5;
-            reasons.push(`Twilight penalty: -${((sunAltitude + 18) * 5).toFixed(0)}`);
+            // Twilight zone: Use smooth sigmoid-like curve for gradual transition
+            // This prevents jarring score jumps between hours
+            // At -18°: penalty = 0 (astronomical night)
+            // At -12°: penalty ≈ 50 (nautical twilight)
+            // At -6°: penalty ≈ 85 (civil twilight)
+            // At 0°: penalty = 95 (sunset/sunrise)
+            const twilightProgress = (sunAltitude + 18) / 18; // 0 at -18°, 1 at 0°
+            // Sigmoid-like curve: steeper in the middle, gentler at edges
+            const sigmoidPenalty = 95 / (1 + Math.exp(-8 * (twilightProgress - 0.5)));
+            score -= sigmoidPenalty;
+            reasons.push(`Twilight penalty: -${sigmoidPenalty.toFixed(0)}`);
         }
 
         // 2. Cloud Cover (Critical)
@@ -1845,12 +1924,19 @@
                 score -= moonPenalty;
             }
 
-            // Sun altitude penalty
-            if (sunAlt > -18) {
-                score -= (sunAlt + 18) * 5;
+            // Sun altitude penalty - use smooth sigmoid curve like calculateDSOScore
+            // This ensures consistency between main gauge and hourly forecast
+            if (sunAlt > 0) {
+                // Daytime - return minimum score directly (can't do DSO astrophotography in daylight)
+                return 5;
+            } else if (sunAlt > -18) {
+                // Twilight zone: smooth sigmoid transition
+                const twilightProgress = (sunAlt + 18) / 18; // 0 at -18°, 1 at 0°
+                const sigmoidPenalty = 90 / (1 + Math.exp(-8 * (twilightProgress - 0.5)));
+                score -= sigmoidPenalty;
             }
 
-            // Transparency contribution
+            // Transparency contribution (only matters at night/twilight)
             score = score * 0.7 + transparencyScoreHour * 0.3;
         } else {
             // Planetary mode - seeing is king
@@ -1957,7 +2043,14 @@
     }
 
     function generateHourlyForecast() {
-        hourlyData = [];
+        // First pass: collect all scores for trend calculation
+        const rawScores: Array<{
+            time: Date;
+            score: number;
+            sunAlt: number;
+            moonAlt: number;
+            timeLabel: string;
+        }> = [];
 
         // Use the current timeline time from Windy, not system time
         const baseDate = new Date(currentTime);
@@ -1968,6 +2061,7 @@
 
         console.log('Generating 24-hour forecast starting from:', startTime.toISOString());
 
+        // Collect raw data first
         for (let i = 0; i < 24; i++) {
             const hourTime = new Date(startTime);
             hourTime.setHours(startTime.getHours() + i);
@@ -1978,7 +2072,6 @@
 
             // Determine if this is today, tomorrow, etc.
             const now = new Date();
-            const isCurrentHour = Math.abs(hourTime.getTime() - baseDate.getTime()) < 3600000; // Within 1 hour
             const daysDiff = Math.floor((hourTime.getTime() - now.getTime()) / (24 * 3600000));
 
             let timeLabel = hourTime.toLocaleTimeString('es-ES', {
@@ -1993,14 +2086,61 @@
                 timeLabel += ` (${daysDiff}d)`;
             }
 
-            hourlyData.push({
-                hour: timeLabel,
+            rawScores.push({
+                time: hourTime,
                 score: Math.round(score),
-                status: getStatusText(score),
                 sunAlt: sunPos.altitude * (180 / Math.PI),
                 moonAlt: moonPos.altitude * (180 / Math.PI),
-                isGoodViewing: score >= 40,
+                timeLabel,
             });
+        }
+
+        // Second pass: calculate trends based on adjacent hours (real data comparison)
+        hourlyData = rawScores.map((data, index) => {
+            // Compare with previous and next hour to determine trend
+            const prevScore = index > 0 ? rawScores[index - 1].score : data.score;
+            const nextScore =
+                index < rawScores.length - 1 ? rawScores[index + 1].score : data.score;
+
+            // Calculate trend based on weighted comparison
+            // Use both previous and next to smooth out noise
+            const avgChange = (data.score - prevScore + (nextScore - data.score)) / 2;
+
+            // Threshold of 5% to consider significant change (avoids noise)
+            let trend: 'up' | 'down' | 'stable';
+            if (avgChange > 5) {
+                trend = 'up';
+            } else if (avgChange < -5) {
+                trend = 'down';
+            } else {
+                trend = 'stable';
+            }
+
+            return {
+                hour: data.timeLabel,
+                score: data.score,
+                status: getStatusText(data.score),
+                sunAlt: data.sunAlt,
+                moonAlt: data.moonAlt,
+                isGoodViewing: data.score >= 40,
+                trend,
+            };
+        });
+
+        // Calculate current trend (is it getting better or worse in next 2 hours?)
+        // Based on real forecast data comparison
+        if (rawScores.length >= 3) {
+            const currentScore = rawScores[0]?.score || 0;
+            const in2Hours = rawScores[2]?.score || currentScore;
+            const trendDiff = in2Hours - currentScore;
+
+            if (trendDiff > 10) {
+                currentTrend = 'improving';
+            } else if (trendDiff < -10) {
+                currentTrend = 'worsening';
+            } else {
+                currentTrend = 'stable';
+            }
         }
 
         console.log(
@@ -2111,11 +2251,13 @@
             precipitableWater,
             aod,
             pm25,
+            dust, // CAMS dust mass
         );
         overallScore = calculateOverallScore();
         dewRisk = calculateDewRisk(temperature, dewPoint);
     }
 
+    // Fetch Air Quality data from CAMS model
     async function fetchAirQuality(lat: number, lon: number) {
         try {
             // Check cache validity
@@ -2130,18 +2272,13 @@
             }
 
             // Request CAMS model specifically for Air Quality using Point Forecast
-            // Meteogram endpoint often ignores specific parameter requests
-            const result = await getPointForecastData(
-                'cams' as any,
-                {
-                    lat,
-                    lon,
-                    step: 3, // CAMS usually has 3h steps
-                },
-                {
-                    p: 'aod550,pm2p5', // specific parameters
-                },
-            );
+            const result = await getPointForecastData('cams' as any, {
+                lat,
+                lon,
+                step: 3, // CAMS usually has 3h steps
+            });
+
+            console.log('CAMS Point Forecast Result:', result);
 
             if (!result || !result.data) {
                 hasAirQuality = false;
@@ -2155,16 +2292,16 @@
             console.log('CAMS Point Forecast Keys:', Object.keys(result.data));
 
             // Try to extract data.
-            // result.data might contain 'aod550' array directly if using getPointForecastData
             const dataHash = result.data as any;
 
             // Sometimes data is nested in 'data' prop depending on wrapper versions
             const actualData = dataHash.data || dataHash;
 
-            // Allow AOD or PM2.5 to be sufficient
-            if (!actualData['aod550'] && !actualData['pm2p5']) {
+            // CAMS provides: pm2p5, chemsDustsm (dust), chemsCosc (CO), chemsSo2sm (SO2)
+            // We need at least pm2p5 or chemsDustsm for air quality
+            if (!actualData['pm2p5'] && !actualData['chemsDustsm']) {
                 console.warn(
-                    'CAMS data missing required keys (aod550, pm2p5). Got:',
+                    'CAMS data missing required keys (pm2p5, chemsDustsm). Got:',
                     Object.keys(actualData),
                 );
                 hasAirQuality = false;
@@ -2310,6 +2447,7 @@
         })
             .then(meteogramResponse => {
                 // Check valid response
+                console.log('Meteogram Forecast Data:', meteogramResponse);
                 if (meteogramResponse && meteogramResponse.data && meteogramResponse.data.data) {
                     const meteoData = meteogramResponse.data.data as any;
 
@@ -2326,6 +2464,8 @@
                         );
 
                         refreshWeatherDataFromCache();
+
+                        // Fetch air quality data from CAMS
                         fetchAirQuality(currentLat, currentLon);
                     }
                 }
@@ -2924,7 +3064,63 @@
         font-size: 36px;
         font-weight: bold;
         color: #fff;
+        margin-bottom: 2px;
+    }
+
+    /* Simple trend indicator below score */
+    .trend-simple {
+        font-size: 12px;
+        font-weight: 500;
         margin-bottom: 5px;
+        padding: 2px 8px;
+        border-radius: 10px;
+        display: inline-block;
+
+        &.improving {
+            color: #4caf50;
+            background: rgba(76, 175, 80, 0.15);
+        }
+
+        &.worsening {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.15);
+        }
+
+        &.stable {
+            color: #888;
+            background: rgba(136, 136, 136, 0.15);
+        }
+    }
+
+    /* Feels Like / Potential indicator - shows average of next 3 hours */
+    .feels-like-inline {
+        font-size: 12px;
+        color: #aaa;
+        margin-bottom: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+
+        span {
+            font-weight: bold;
+        }
+    }
+
+    .trend-mini {
+        font-size: 14px;
+
+        &.improving {
+            color: #4caf50;
+        }
+
+        &.worsening {
+            color: #f44336;
+        }
+
+        &.stable {
+            color: #ffc107;
+        }
     }
 
     .astro-status {
@@ -3328,5 +3524,194 @@
     .diag-header:hover {
         color: #ffffff;
         text-decoration-color: #fff;
+    }
+
+    /* Best Nearby Window & Trend Indicators */
+    .best-nearby-indicator {
+        background: linear-gradient(135deg, rgba(0, 122, 204, 0.15), rgba(0, 180, 120, 0.15));
+        border: 1px solid rgba(0, 122, 204, 0.4);
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .nearby-label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #aaa;
+    }
+
+    .nearby-icon {
+        font-size: 16px;
+    }
+
+    .nearby-value {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .nearby-score {
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    .nearby-time {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .trend-indicator {
+        margin-left: auto;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &.improving {
+            background: rgba(76, 175, 80, 0.25);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+        }
+
+        &.worsening {
+            background: rgba(244, 67, 54, 0.25);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.4);
+        }
+
+        &.stable {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+    }
+
+    .trend-arrow {
+        font-size: 14px;
+    }
+
+    /* Hourly trend indicators */
+    .hourly-trend {
+        font-size: 12px;
+        margin-left: 4px;
+
+        &.up {
+            color: #4caf50;
+        }
+
+        &.down {
+            color: #f44336;
+        }
+
+        &.stable {
+            color: #888;
+        }
+    }
+
+    /* Dual Score Container - Like Temperature vs Feels Like */
+    .dual-score-container {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 15px;
+        background: linear-gradient(135deg, rgba(40, 40, 50, 0.8), rgba(30, 30, 40, 0.9));
+        border-radius: 12px;
+        padding: 15px 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dual-score-item {
+        flex: 1;
+        text-align: center;
+        padding: 10px 8px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.2);
+
+        &.current {
+            border: 1px solid rgba(0, 122, 204, 0.4);
+        }
+
+        &.potential {
+            border: 1px solid rgba(0, 180, 120, 0.4);
+            background: rgba(0, 180, 120, 0.05);
+        }
+    }
+
+    .dual-score-label {
+        font-size: 11px;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .dual-score-value {
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 1.1;
+    }
+
+    .dual-score-status,
+    .dual-score-time {
+        font-size: 10px;
+        color: #888;
+        margin-top: 4px;
+    }
+
+    .dual-score-divider {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0 5px;
+        min-width: 50px;
+    }
+
+    .trend-arrow-big {
+        font-size: 24px;
+        font-weight: bold;
+        line-height: 1;
+
+        &.improving {
+            color: #4caf50;
+        }
+
+        &.worsening {
+            color: #f44336;
+        }
+
+        &.stable {
+            color: #ffc107;
+        }
+    }
+
+    .trend-label {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        margin-top: 4px;
+
+        &.improving {
+            color: #4caf50;
+        }
+
+        &.worsening {
+            color: #f44336;
+        }
+
+        &.stable {
+            color: #ffc107;
+        }
     }
 </style>
