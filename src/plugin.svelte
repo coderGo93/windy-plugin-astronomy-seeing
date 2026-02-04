@@ -284,7 +284,7 @@
                     <div class="diagnostic-row">
                         <span>{t('localTime')}:</span>
                         <span
-                            >{currentTime.toLocaleString('es-ES', {
+                            >{currentTime.toLocaleString(getLocale(), {
                                 year: 'numeric',
                                 month: '2-digit',
                                 day: '2-digit',
@@ -716,12 +716,12 @@
             <button class="toggle-btn" on:click={() => (showHourly = !showHourly)}>
                 {showHourly ? '▼' : '▶'}
                 {t('next24Hours')} - {t('from')}
-                {currentTime.toLocaleDateString('es-ES', {
+                {currentTime.toLocaleDateString(getLocale(), {
                     weekday: 'short',
                     day: '2-digit',
                     month: '2-digit',
                 })}
-                {currentTime.toLocaleTimeString('es-ES', {
+                {currentTime.toLocaleTimeString(getLocale(), {
                     hour: '2-digit',
                     minute: '2-digit',
                 })}
@@ -1010,6 +1010,15 @@
             at: 'at',
             in3Hours: 'In next 3h',
             feelsLike: 'Potential',
+            veryPoor: 'Very Poor',
+            maxRecommended: 'max recommended',
+            allFlOk: 'All FL OK',
+            avoidLongFl: 'Avoid long FL',
+            shortFlOnly: 'Short FL only',
+            wideFieldOnly: 'Wide field only',
+            twilightPenalty: 'Twilight penalty',
+            cloudPenalty: 'Cloud penalty',
+            moonPenalty: 'Moon penalty',
         },
         es: {
             // UI Labels
@@ -1132,6 +1141,54 @@
                 'Ventanas de Observación: Muestran períodos óptimos con horarios de inicio/fin, duración y hora pico. Barras verdes indican períodos buenos.',
             helpTrend:
                 'Muestra si las condiciones están mejorando (↗), empeorando (↘), o estables (→) en las próximas 2 horas basado en datos reales del pronóstico.',
+            // Glosario y Ayuda faltantes
+            glossaryCoords: 'Coordenadas: Ubicación precisa para el pronóstico.',
+            glossaryTime: 'Hora: Referencia de hora local y UTC.',
+            glossaryAstroTwilight:
+                'Crepúsculo Astronómico: Sol < -18°. Se necesita cielo totalmente oscuro para DSO.',
+            glossaryMoonPhase:
+                'Fase Lunar: Luna Nueva es mejor (0% iluminación). Luna Llena lava los DSOs.',
+            glossaryJetStream:
+                'Corriente en Chorro: Viento en altura. <20m/s (70km/h) es mejor para imágenes nítidas.',
+            glossarySeeingFWHM:
+                'Seeing (FWHM): Borrosidad atmosférica en arcosegundos. <2" es bueno.',
+            glossaryCloudLayers:
+                'Capas de Nubes: Nubes altas dañan más la transparencia. Nubes bajas pueden estar debajo de ti.',
+            glossaryThermalGradient:
+                'Gradiente Térmico: Tasa de cambio. >6.5°C/km = aire inestable. <6°C/km = estable.',
+            glossaryPrecipWater:
+                'Agua Precipitable: Volumen de vapor. <10mm = excelente transparencia. >20mm = mala.',
+            glossaryStabilityIndex:
+                'Índice de Estabilidad: Aprox. índice K. <20 = visión estable. >30 = inestable.',
+            glossaryDewPointGap:
+                'Diferencia de Rocío: Formato T-Rocío. <2°C pone tu óptica en riesgo de empañarse.',
+            glossarySurfaceWind: 'Viento Superficial: >15km/h causa vibración en el telescopio.',
+            glossaryHeater: 'Calentador: Esencial si la diferencia de rocío es <2°C.',
+            glossaryMaxMag:
+                'Magnificación Máx: Limitada por seeing. Mal seeing hace borrosas las vistas de alta potencia.',
+            glossaryDSOWeight:
+                'Ponderación DSO: Nubes (Principal), Transparencia (20%), Seeing (10%), Penalización Lunar.',
+            glossaryPlanetaryWeight:
+                'Ponderación Planetaria: Seeing (60%), Nubes (30%), Sol/Luna (Menor).',
+            glossaryModelDisclaimer:
+                'Nota: Datos derivados de modelos meteorológicos numéricos globales (NWP). Topografía local puede variar.',
+            windGusts: 'Ráfagas',
+            humidity: 'Humedad',
+            glossaryDust: 'Masa de Polvo: Concentración de partículas. Degrada transparencia.',
+            glossaryCalculation: 'Lógica de Cálculo',
+            glossaryCalcDetails:
+                'Puntaje = 100% - Penalizaciones (Nubes, Humedad >85%, Viento, PM2.5/Polvo, Luna).',
+            helpEquipment:
+                'Resolución = (206.265 * TamañoPixel) / DistanciaFocal. Igualar resolución al seeing es clave.',
+            veryPoor: 'Muy Malo',
+            maxRecommended: 'máx recomendado',
+            allFlOk: 'Toda DF OK',
+            avoidLongFl: 'Evitar DF larga',
+            shortFlOnly: 'Solo DF corta',
+            wideFieldOnly: 'Solo campo amplio',
+            twilightPenalty: 'Penalización por crepúsculo',
+            cloudPenalty: 'Penalización por nubes',
+            moonPenalty: 'Penalización por luna',
         },
         fr: {
             excellent: 'EXCELLENT',
@@ -1164,6 +1221,15 @@
             fullMoon: 'Pleine Lune',
             belowHorizon: '(Sous horizon)',
             aboveHorizon: '(Au-dessus horizon)',
+            veryPoor: 'TRES MAUVAIS',
+            maxRecommended: 'max recommandé',
+            allFlOk: 'Toute focale OK',
+            avoidLongFl: 'Éviter longue focale',
+            shortFlOnly: 'Courte focale seulement',
+            wideFieldOnly: 'Grand champ seulement',
+            twilightPenalty: 'Pénalité crépusculaire',
+            cloudPenalty: 'Pénalité nuageuse',
+            moonPenalty: 'Pénalité lunaire',
         },
         de: {
             excellent: 'AUSGEZEICHNET',
@@ -1196,6 +1262,15 @@
             fullMoon: 'Vollmond',
             belowHorizon: '(Unter Horizont)',
             aboveHorizon: '(Über Horizont)',
+            veryPoor: 'SEHR SCHLECHT',
+            maxRecommended: 'max empfohlen',
+            allFlOk: 'Jede Brennweite OK',
+            avoidLongFl: 'Lange Brennweite vermeiden',
+            shortFlOnly: 'Nur kurze Brennweite',
+            wideFieldOnly: 'Nur Weitfeld',
+            twilightPenalty: 'Dämmerungsstrafe',
+            cloudPenalty: 'Wolkenstrafe',
+            moonPenalty: 'Mondstrafe',
         },
         it: {
             excellent: 'ECCELLENTE',
@@ -1228,6 +1303,15 @@
             fullMoon: 'Luna Piena',
             belowHorizon: '(Sotto orizzonte)',
             aboveHorizon: '(Sopra orizzonte)',
+            veryPoor: 'MOLTO SCARSO',
+            maxRecommended: 'massimo consigliato',
+            allFlOk: 'Ogni focale OK',
+            avoidLongFl: 'Evita focali lunghe',
+            shortFlOnly: 'Solo focali corte',
+            wideFieldOnly: 'Solo campo largo',
+            twilightPenalty: 'Penalità crepuscolo',
+            cloudPenalty: 'Penalità nuvole',
+            moonPenalty: 'Penalità luna',
         },
         pt: {
             excellent: 'EXCELENTE',
@@ -1260,6 +1344,15 @@
             fullMoon: 'Lua Cheia',
             belowHorizon: '(Abaixo horizonte)',
             aboveHorizon: '(Acima horizonte)',
+            veryPoor: 'MUITO RUIM',
+            maxRecommended: 'máx recomendado',
+            allFlOk: 'Toda focagem OK',
+            avoidLongFl: 'Evitar focagens longas',
+            shortFlOnly: 'Apenas focagens curtas',
+            wideFieldOnly: 'Apenas campo amplo',
+            twilightPenalty: 'Penalidade de crepúsculo',
+            cloudPenalty: 'Penalidade de nuvens',
+            moonPenalty: 'Penalidade da lua',
         },
     };
 
@@ -1494,7 +1587,7 @@
 
     function calculateDSOScore(): number {
         let score = 100;
-        let reasons: string[] = [];
+        scoreReasons = [];
 
         // 1. Sun Altitude - IMPROVED: Smooth sigmoid transition instead of hard cutoff
         // This provides a gradual penalty as the sky gets brighter, which is more realistic
@@ -1513,7 +1606,7 @@
             // Sigmoid-like curve: steeper in the middle, gentler at edges
             const sigmoidPenalty = 95 / (1 + Math.exp(-8 * (twilightProgress - 0.5)));
             score -= sigmoidPenalty;
-            reasons.push(`Twilight penalty: -${sigmoidPenalty.toFixed(0)}`);
+            scoreReasons.push(`${t('twilightPenalty')}: -${sigmoidPenalty.toFixed(0)}`);
         }
 
         // 2. Cloud Cover (Critical)
@@ -1521,7 +1614,9 @@
         if (effectiveCloudCover > 0) {
             const penalty = effectiveCloudCover * 0.8;
             score -= penalty;
-            reasons.push(`Cloud penalty (${effectiveCloudCover}%): -${penalty.toFixed(0)}`);
+            scoreReasons.push(
+                `${t('cloudPenalty')} (${effectiveCloudCover.toFixed(0)}%): -${penalty.toFixed(0)}`,
+            );
         }
 
         // 3. Moon Factor
@@ -1540,8 +1635,8 @@
                     break;
             }
             score -= moonPenalty;
-            reasons.push(
-                `Moon penalty (${(moonIllumination * 100).toFixed(0)}%): -${moonPenalty.toFixed(0)}`,
+            scoreReasons.push(
+                `${t('moonPenalty')} (${(moonIllumination * 100).toFixed(0)}%): -${moonPenalty.toFixed(0)}`,
             );
         }
 
@@ -1555,6 +1650,7 @@
 
     function calculatePlanetaryScore(): number {
         let score = 100;
+        scoreReasons = [];
 
         // === PRIMARY FACTORS FOR PLANETARY ===
 
@@ -1681,6 +1777,23 @@
         return 'en';
     }
 
+    function getLocale(): string {
+        switch (currentLanguage) {
+            case 'es':
+                return 'es-ES';
+            case 'fr':
+                return 'fr-FR';
+            case 'de':
+                return 'de-DE';
+            case 'it':
+                return 'it-IT';
+            case 'pt':
+                return 'pt-BR';
+            default:
+                return 'en-US';
+        }
+    }
+
     function t(key: keyof typeof translations.en): string {
         return translations[currentLanguage][key] || translations.en[key];
     }
@@ -1758,11 +1871,11 @@
     }
 
     function getSeeingEstimate(windSpeed: number): string {
-        if (windSpeed < 20) return '1.5-2.5" (Excellent)';
-        if (windSpeed < 35) return '2.5-3.5" (Good)';
-        if (windSpeed < 50) return '3.5-4.5" (Fair)';
-        if (windSpeed < 70) return '4.5-6" (Poor)';
-        return '>6" (Very Poor)';
+        if (windSpeed < 20) return `1.5-2.5" (${t('excellent')})`;
+        if (windSpeed < 35) return `2.5-3.5" (${t('good')})`;
+        if (windSpeed < 50) return `3.5-4.5" (${t('fair')})`;
+        if (windSpeed < 70) return `4.5-6" (${t('poor')})`;
+        return `>6" (${t('veryPoor')})`;
     }
 
     function getTotalCloudCover(): number {
@@ -1794,14 +1907,14 @@
         const baseExposure = windSpeed < 30 ? 300 : windSpeed < 50 ? 180 : 120;
         const flFactor = focalLength > 1000 ? 0.7 : focalLength > 500 ? 0.85 : 1.0;
         const recommended = Math.round(baseExposure * flFactor);
-        return `${recommended}s (max recommended)`;
+        return `${recommended}s (${t('maxRecommended')})`;
     }
 
     function getOptimalFocalLength(windSpeed: number): string {
-        if (windSpeed < 25) return '< 2000mm (All FL OK)';
-        if (windSpeed < 40) return '< 1200mm (Avoid long FL)';
-        if (windSpeed < 60) return '< 600mm (Short FL only)';
-        return '< 300mm (Wide field only)';
+        if (windSpeed < 25) return `< 2000mm (${t('allFlOk')})`;
+        if (windSpeed < 40) return `< 1200mm (${t('avoidLongFl')})`;
+        if (windSpeed < 60) return `< 600mm (${t('shortFlOnly')})`;
+        return `< 300mm (${t('wideFieldOnly')})`;
     }
 
     function getMoonImpact(): number {
@@ -2074,7 +2187,7 @@
             const now = new Date();
             const daysDiff = Math.floor((hourTime.getTime() - now.getTime()) / (24 * 3600000));
 
-            let timeLabel = hourTime.toLocaleTimeString('es-ES', {
+            let timeLabel = hourTime.toLocaleTimeString(getLocale(), {
                 hour: '2-digit',
                 minute: '2-digit',
             });
@@ -2145,7 +2258,7 @@
 
         console.log(
             'Hourly forecast generated: 24 hours starting from',
-            startTime.toLocaleString('es-ES'),
+            startTime.toLocaleString(getLocale()),
         );
     }
 
@@ -2179,7 +2292,7 @@
             const viewingWindow = findViewingWindow(forecastDate);
 
             forecastData.push({
-                date: forecastDate.toLocaleDateString('es-ES', {
+                date: forecastDate.toLocaleDateString(getLocale(), {
                     weekday: 'short',
                     month: '2-digit',
                     day: '2-digit',
