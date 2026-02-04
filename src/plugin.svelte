@@ -120,7 +120,7 @@
                     imagingMode = 'dso';
                 }}
             >
-                DSO
+                {t('dso')}
             </button>
             <button
                 class="mode-btn {imagingMode === 'planetary' ? 'active' : ''}"
@@ -1045,8 +1045,18 @@
             highClouds: 'High Clouds',
             atmosphericConditions: 'Atmospheric Conditions',
             visitRepo: 'Visit Repository',
+            dso: 'DSO',
+            help: 'Help', // Verify help key exists
+            stable: 'Stable',
+            moderate: 'Moderate',
+            unstable: 'Unstable',
         },
         es: {
+            dso: 'DSO',
+            help: 'Ayuda',
+            stable: 'Estable',
+            moderate: 'Moderado',
+            unstable: 'Inestable',
             // UI Labels
             dsoType: 'Tipo DSO',
             galaxies: 'Galaxias',
@@ -1069,7 +1079,7 @@
             sunMoon: 'Sol/Luna',
             now: 'Ahora',
             // More UI Labels
-            seeing: 'Seeing',
+            seeing: 'Deformación (Seeing)',
             transparency: 'Transparencia',
             darkSky: 'Cielo Oscuro',
             dewRisk: 'Riesgo de Rocío',
@@ -1105,7 +1115,6 @@
             trend: 'Tendencia',
             improving: 'Mejorando',
             worsening: 'Empeorando',
-            stable: 'Estable',
             at: 'a las',
             in3Hours: 'En próximas 3h',
             feelsLike: 'Potencial',
@@ -1232,7 +1241,6 @@
             aod: 'AOD (550nm)',
             pm25: 'PM2.5',
             dustMass: 'Masa de Polvo',
-
             // HTML Help Content
             aodHelp:
                 '<strong>AOD (550nm):</strong> Profundidad Óptica de Aerosoles. Mide extinción de luz por polvo/bruma. < 0.1 es Excelente.',
@@ -1247,8 +1255,6 @@
             jetStream: 'Corriente en Chorro (250hPa)',
             seeingEstimate: 'Estimación Seeing',
             highClouds: 'Nubes Altas',
-            atmosphericConditions: 'Condiciones Atmosféricas',
-            visitRepo: 'Visitar Repositorio',
         },
         fr: {
             excellent: 'EXCELLENT',
@@ -1324,6 +1330,11 @@
             highClouds: 'Nuages Hauts',
             atmosphericConditions: 'Conditions Atmosphériques',
             visitRepo: 'Visiter Dépôt',
+            dso: 'Ciel Profond',
+            help: 'Aide',
+            stable: 'Stable',
+            moderate: 'Modéré',
+            unstable: 'Instable',
         },
         de: {
             excellent: 'AUSGEZEICHNET',
@@ -1398,6 +1409,11 @@
             highClouds: 'Hohe Wolken',
             atmosphericConditions: 'Atmosphärische Bedingungen',
             visitRepo: 'Repository Besuchen',
+            dso: 'Deep Sky',
+            help: 'Hilfe',
+            stable: 'Stabil',
+            moderate: 'Mäßig',
+            unstable: 'Instabil',
         },
         it: {
             excellent: 'ECCELLENTE',
@@ -1473,6 +1489,11 @@
             highClouds: 'Nuvole Alte',
             atmosphericConditions: 'Condizioni Atmosferiche',
             visitRepo: 'Visita Repository',
+            dso: 'Cielo Profondo',
+            help: 'Aiuto',
+            stable: 'Stabile',
+            moderate: 'Moderato',
+            unstable: 'Instabile',
         },
         pt: {
             excellent: 'EXCELENTE',
@@ -1547,6 +1568,11 @@
             highClouds: 'Nuvens Altas',
             atmosphericConditions: 'Condições Atmosféricas',
             visitRepo: 'Visitar Repositório',
+            dso: 'Céu Profundo',
+            help: 'Ajuda',
+            stable: 'Estável',
+            moderate: 'Moderado',
+            unstable: 'Instável',
         },
     };
 
