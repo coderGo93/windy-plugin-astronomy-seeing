@@ -308,18 +308,12 @@
 
                     {#if showAstroHelp}
                         <div class="help-glossary">
-                            <div class="help-item">
-                                <strong>Astro Twilight:</strong> Sun &lt; -18°. Pitch black sky needed
-                                for DSO.
-                            </div>
-                            <div class="help-item">
-                                <strong>Moon Phase:</strong> New Moon is best (0% illumination). Full
-                                Moon washes out DSOs.
-                            </div>
+                            <div class="help-item">{t('glossaryAstroTwilight')}</div>
+                            <div class="help-item">{t('glossaryMoonPhase')}</div>
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Sun Altitude:</span>
+                        <span>{t('sunAltitude')}:</span>
                         <span
                             class={sunAltitude < -18
                                 ? 'good-value'
@@ -329,13 +323,13 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Twilight Phase:</span>
+                        <span>{t('twilightPhase')}:</span>
                         <span class={getTwilightClass(sunAltitude)}
                             >{getTwilightPhase(sunAltitude)}</span
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Moon Altitude:</span>
+                        <span>{t('moonAltitude')}:</span>
                         <span
                             >{moonAltitude.toFixed(1)}° {moonAltitude < 0
                                 ? t('belowHorizon')
@@ -343,11 +337,11 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Moon Illumination:</span>
+                        <span>{t('moonIllumination')}:</span>
                         <span>{(moonIllumination * 100).toFixed(1)}%</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Moon Phase:</span>
+                        <span>{t('moonPhase')}:</span>
                         <span>{getMoonPhase(moonIllumination)}</span>
                     </div>
                 </div>
@@ -358,7 +352,7 @@
                         class="diag-header"
                         on:click={() => (showConditionsHelp = !showConditionsHelp)}
                     >
-                        <span>🌤️ Atmospheric Conditions</span>
+                        <span>🌤️ {t('atmosphericConditions')}</span>
                         <span>{showConditionsHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -370,7 +364,7 @@
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Jet Stream (250hPa):</span>
+                        <span>{t('jetStream')}:</span>
                         <span
                             class={windSpeed250 < 30
                                 ? 'good-value'
@@ -380,13 +374,13 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Seeing Estimate:</span>
+                        <span>{t('seeingEstimate')}:</span>
                         <span class={getSeeingClass(seeingScore)}
                             >{getSeeingEstimate(windSpeed250)}"</span
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>High Clouds:</span>
+                        <span>{t('highClouds')}:</span>
                         <span
                             class={highClouds < 20
                                 ? 'good-value'
@@ -396,7 +390,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Mid Clouds:</span>
+                        <span>{t('midClouds')}:</span>
                         <span
                             class={midClouds < 30
                                 ? 'good-value'
@@ -406,7 +400,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Low Clouds:</span>
+                        <span>{t('lowClouds')}:</span>
                         <span
                             class={lowClouds < 40
                                 ? 'good-value'
@@ -416,7 +410,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Total Cloud Cover:</span>
+                        <span>{t('totalCloudCover')}:</span>
                         <span
                             class={totalCloudCover < 20
                                 ? 'good-value'
@@ -433,7 +427,7 @@
                         class="diag-header"
                         on:click={() => (showEnvironmentHelp = !showEnvironmentHelp)}
                     >
-                        <span>🌡️ Environmental Conditions</span>
+                        <span>🌡️ {t('envConditions')}</span>
                         <span>{showEnvironmentHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -444,11 +438,11 @@
                         </div>
                     {/if}
                     <div class="diagnostic-row">
-                        <span>Temperature:</span>
+                        <span>{t('temperature')}:</span>
                         <span>{formatTemperature(temperature, true)}</span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Dew Point:</span>
+                        <span>{t('dewPoint')}:</span>
                         <span>{formatTemperature(dewPoint, true)}</span>
                     </div>
                     <div class="diagnostic-row">
@@ -468,7 +462,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Dew Point Gap:</span>
+                        <span>{t('dewPointGap')}:</span>
                         <span
                             class={temperature - dewPoint > 5
                                 ? 'good-value'
@@ -478,7 +472,7 @@
                         >
                     </div>
                     <div class="diagnostic-row">
-                        <span>Dew Formation Time:</span>
+                        <span>{t('dewFormationTime')}:</span>
                         <span>{getDewFormationTime(temperature, dewPoint)}</span>
                     </div>
                 </div>
@@ -490,23 +484,21 @@
                             class="diag-header"
                             on:click={() => (showAirQualityHelp = !showAirQualityHelp)}
                         >
-                            <span>{showAirQualityHelp ? '▼' : '▶'} Air Quality (CAMS)</span>
+                            <span>{showAirQualityHelp ? '▼' : '▶'} {t('airQualityCAMS')}</span>
                         </div>
                         {#if showAirQualityHelp}
                             <div class="help-glossary">
                                 {#if aod >= 0}
                                     <div class="help-item">
-                                        <strong>AOD (550nm):</strong> Aerosol Optical Depth. Measures
-                                        extinction of light by dust/haze. &lt; 0.1 is Excellent.
+                                        {@html t('aodHelp')}
                                     </div>
                                 {/if}
                                 <div class="help-item">
-                                    <strong>PM2.5:</strong> Fine particles. Affects transparency near
-                                    horizon.
+                                    {@html t('pm25Help')}
                                 </div>
                                 {#if dust >= 0}
                                     <div class="help-item">
-                                        <strong>Dust Mass:</strong>
+                                        <strong>{t('dustMass')}:</strong>
                                         {t('glossaryDust')}
                                     </div>
                                 {/if}
@@ -514,7 +506,7 @@
                         {/if}
                         {#if aod >= 0}
                             <div class="diagnostic-row">
-                                <span>AOD (550nm):</span>
+                                <span>{t('aod')}:</span>
                                 <span
                                     class={aod < 0.1
                                         ? 'good-value'
@@ -527,7 +519,7 @@
                             </div>
                         {/if}
                         <div class="diagnostic-row">
-                            <span>PM2.5:</span>
+                            <span>{t('pm25')}:</span>
                             <span
                                 class={pm25 < 5
                                     ? 'good-value'
@@ -540,7 +532,7 @@
                         </div>
                         {#if dust >= 0}
                             <div class="diagnostic-row">
-                                <span>Dust Mass:</span>
+                                <span>{t('dustMass')}:</span>
                                 <span
                                     class={dust < 10
                                         ? 'good-value'
@@ -561,7 +553,7 @@
                         class="diag-header"
                         on:click={() => (showAtmosphericHelp = !showAtmosphericHelp)}
                     >
-                        <span>🔬 Advanced Atmospheric</span>
+                        <span>🔬 {t('advancedAtmo')}</span>
                         <span>{showAtmosphericHelp ? '▼' : '▶'}</span>
                     </div>
 
@@ -580,7 +572,7 @@
                     {/if}
 
                     <div class="diagnostic-row">
-                        <span>Thermal Gradient:</span>
+                        <span>{t('thermalGradient')}:</span>
                         <span
                             class={thermalGradient < 6.0
                                 ? 'good-value'
@@ -590,15 +582,15 @@
                             >{thermalGradient.toFixed(2)} °C/km
                             <small
                                 >({thermalGradient < 6.0
-                                    ? 'Stable'
+                                    ? t('stable')
                                     : thermalGradient < 7.5
-                                      ? 'Moderate'
-                                      : 'Unstable'})</small
+                                      ? t('moderate')
+                                      : t('unstable')})</small
                             >
                         </span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Precipitable Water:</span>
+                        <span>{t('precipWater')}:</span>
                         <span
                             class={precipitableWater < 10
                                 ? 'good-value'
@@ -608,15 +600,16 @@
                             >{precipitableWater.toFixed(1)} mm
                             <small
                                 >({precipitableWater < 10
-                                    ? 'Excellent'
+                                    ? t('excellent')
                                     : precipitableWater < 20
-                                      ? 'Good'
-                                      : 'Poor'} transparency)</small
+                                      ? t('good')
+                                      : t('poor')}
+                                {t('transparency')})</small
                             >
                         </span>
                     </div>
                     <div class="diagnostic-row">
-                        <span>Stability Index:</span>
+                        <span>{t('stabilityIndex')}:</span>
                         <span
                             class={stabilityIndex < 20
                                 ? 'good-value'
@@ -626,10 +619,10 @@
                             >{stabilityIndex.toFixed(1)}
                             <small
                                 >({stabilityIndex < 20
-                                    ? 'Stable'
+                                    ? t('stable')
                                     : stabilityIndex < 30
-                                      ? 'Moderate'
-                                      : 'Unstable'})</small
+                                      ? t('moderate')
+                                      : t('unstable')})</small
                             >
                         </span>
                     </div>
@@ -1019,6 +1012,39 @@
             twilightPenalty: 'Twilight penalty',
             cloudPenalty: 'Cloud penalty',
             moonPenalty: 'Moon penalty',
+            // Diagnostic Labels
+            lowClouds: 'Low Clouds',
+            midClouds: 'Mid Clouds',
+            totalCloudCover: 'Total Cloud Cover',
+            envConditions: 'Environmental Conditions',
+            temperature: 'Temperature',
+            dewPoint: 'Dew Point',
+            dewPointGap: 'Dew Point Gap',
+            dewFormationTime: 'Dew Formation Time',
+            airQualityCAMS: 'Air Quality (CAMS)',
+            advancedAtmo: 'Advanced Atmospheric',
+            thermalGradient: 'Thermal Gradient',
+            precipWater: 'Precipitable Water',
+            stabilityIndex: 'Stability Index',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Dust Mass',
+
+            // HTML Help Content
+            aodHelp:
+                '<strong>AOD (550nm):</strong> Aerosol Optical Depth. Measures extinction of light by dust/haze. < 0.1 is Excellent.',
+            pm25Help: '<strong>PM2.5:</strong> Fine particles. Affects transparency near horizon.',
+            // New EN Keys
+            sunAltitude: 'Sun Altitude',
+            twilightPhase: 'Twilight Phase',
+            moonAltitude: 'Moon Altitude',
+            moonIllumination: 'Moon Illumination',
+            moonPhase: 'Moon Phase',
+            jetStream: 'Jet Stream (250hPa)',
+            seeingEstimate: 'Seeing Estimate',
+            highClouds: 'High Clouds',
+            atmosphericConditions: 'Atmospheric Conditions',
+            visitRepo: 'Visit Repository',
         },
         es: {
             // UI Labels
@@ -1189,6 +1215,40 @@
             twilightPenalty: 'Penalización por crepúsculo',
             cloudPenalty: 'Penalización por nubes',
             moonPenalty: 'Penalización por luna',
+            // Diagnostic Labels
+            lowClouds: 'Nubes Bajas',
+            midClouds: 'Nubes Medias',
+            totalCloudCover: 'Cobertura de Nubes Total',
+            envConditions: 'Condiciones Ambientales',
+            temperature: 'Temperatura',
+            dewPoint: 'Punto de Rocío',
+            dewPointGap: 'Diferencia de Rocío',
+            dewFormationTime: 'Tiempo de Formación de Rocío',
+            airQualityCAMS: 'Calidad del Aire (CAMS)',
+            advancedAtmo: 'Atmosférico Avanzado',
+            thermalGradient: 'Gradiente Térmico',
+            precipWater: 'Agua Precipitable',
+            stabilityIndex: 'Índice de Estabilidad',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Masa de Polvo',
+
+            // HTML Help Content
+            aodHelp:
+                '<strong>AOD (550nm):</strong> Profundidad Óptica de Aerosoles. Mide extinción de luz por polvo/bruma. < 0.1 es Excelente.',
+            pm25Help:
+                '<strong>PM2.5:</strong> Partículas finas. Afecta transparencia cerca del horizonte.',
+            // New ES Keys
+            sunAltitude: 'Altitud Sol',
+            twilightPhase: 'Fase Crepuscular',
+            moonAltitude: 'Altitud Luna',
+            moonIllumination: 'Iluminación Luna',
+            moonPhase: 'Fase Luna',
+            jetStream: 'Corriente en Chorro (250hPa)',
+            seeingEstimate: 'Estimación Seeing',
+            highClouds: 'Nubes Altas',
+            atmosphericConditions: 'Condiciones Atmosféricas',
+            visitRepo: 'Visitar Repositorio',
         },
         fr: {
             excellent: 'EXCELLENT',
@@ -1230,6 +1290,40 @@
             twilightPenalty: 'Pénalité crépusculaire',
             cloudPenalty: 'Pénalité nuageuse',
             moonPenalty: 'Pénalité lunaire',
+            // Diagnostic Labels FR
+            lowClouds: 'Nuages Bas',
+            midClouds: 'Nuages Moyens',
+            totalCloudCover: 'Couverture Nuageuse Totale',
+            envConditions: 'Conditions Environnementales',
+            temperature: 'Température',
+            dewPoint: 'Point de Rosée',
+            dewPointGap: 'Écart Point de Rosée',
+            dewFormationTime: 'Temps Formation Rosée',
+            airQualityCAMS: "Qualité de l'Air (CAMS)",
+            advancedAtmo: 'Atmosphère Avancée',
+            thermalGradient: 'Gradient Thermique',
+            precipWater: 'Eau Précipitable',
+            stabilityIndex: 'Indice de Stabilité',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Masse de Poussière',
+
+            // HTML Help Content
+            aodHelp:
+                "<strong>AOD (550nm):</strong> Épaisseur Optique des Aérosols. Mesure l'extinction par poussière/brume. < 0.1 est Excellent.",
+            pm25Help:
+                "<strong>PM2.5:</strong> Particules fines. Affecte la transparence près de l'horizon.",
+            // New FR Keys
+            sunAltitude: 'Altitude Soleil',
+            twilightPhase: 'Phase Crépusculaire',
+            moonAltitude: 'Altitude Lune',
+            moonIllumination: 'Illumination Lunaire',
+            moonPhase: 'Phase Lunaire',
+            jetStream: 'Jet Stream (250hPa)',
+            seeingEstimate: 'Estimation Seeing',
+            highClouds: 'Nuages Hauts',
+            atmosphericConditions: 'Conditions Atmosphériques',
+            visitRepo: 'Visiter Dépôt',
         },
         de: {
             excellent: 'AUSGEZEICHNET',
@@ -1271,6 +1365,39 @@
             twilightPenalty: 'Dämmerungsstrafe',
             cloudPenalty: 'Wolkenstrafe',
             moonPenalty: 'Mondstrafe',
+            // Diagnostic Labels DE
+            lowClouds: 'Tiefe Wolken',
+            midClouds: 'Mittlere Wolken',
+            totalCloudCover: 'Gesamtbewölkung',
+            envConditions: 'Umweltbedingungen',
+            temperature: 'Temperatur',
+            dewPoint: 'Taupunkt',
+            dewPointGap: 'Taupunkt-Differenz',
+            dewFormationTime: 'Tau-Bildungszeit',
+            airQualityCAMS: 'Luftqualität (CAMS)',
+            advancedAtmo: 'Erweiterte Atmosphäre',
+            thermalGradient: 'Thermischer Gradient',
+            precipWater: 'Niederschlagswasser',
+            stabilityIndex: 'Stabilitätsindex',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Staubmasse',
+
+            // HTML Help Content
+            aodHelp:
+                '<strong>AOD (550nm):</strong> Aerosol Optische Dicke. Misst Lichtdämpfung durch Staub/Dunst. < 0.1 ist Ausgezeichnet.',
+            pm25Help: '<strong>PM2.5:</strong> Feinstaub. Beeinflusst Transparenz am Horizont.',
+            // New DE Keys
+            sunAltitude: 'Sonnenhöhe',
+            twilightPhase: 'Dämmerungsphase',
+            moonAltitude: 'Mondhöhe',
+            moonIllumination: 'Mondbeleuchtung',
+            moonPhase: 'Mondphase',
+            jetStream: 'Jetstream (250hPa)',
+            seeingEstimate: 'Seeing-Schätzung',
+            highClouds: 'Hohe Wolken',
+            atmosphericConditions: 'Atmosphärische Bedingungen',
+            visitRepo: 'Repository Besuchen',
         },
         it: {
             excellent: 'ECCELLENTE',
@@ -1312,6 +1439,40 @@
             twilightPenalty: 'Penalità crepuscolo',
             cloudPenalty: 'Penalità nuvole',
             moonPenalty: 'Penalità luna',
+            // Diagnostic Labels IT
+            lowClouds: 'Nuvole Basse',
+            midClouds: 'Nuvole Medie',
+            totalCloudCover: 'Copertura Nuvolosa Totale',
+            envConditions: 'Condizioni Ambientali',
+            temperature: 'Temperatura',
+            dewPoint: 'Punto di Rugiada',
+            dewPointGap: 'Divario Punto di Rugiada',
+            dewFormationTime: 'Tempo Formazione Rugiada',
+            airQualityCAMS: "Qualità dell'Aria (CAMS)",
+            advancedAtmo: 'Atmosfera Avanzata',
+            thermalGradient: 'Gradiente Termico',
+            precipWater: 'Acqua Precipitabile',
+            stabilityIndex: 'Indice di Stabilità',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Massa di Polvere',
+
+            // HTML Help Content
+            aodHelp:
+                '<strong>AOD (550nm):</strong> Spessore Ottico Aerosol. Misura estinzione luce da polvere/foschia. < 0.1 è Eccellente.',
+            pm25Help:
+                '<strong>PM2.5:</strong> Particolato fine. Influenza trasparenza vicino orizzonte.',
+            // New IT keys
+            sunAltitude: 'Altitudine Sole',
+            twilightPhase: 'Fase Crepuscolare',
+            moonAltitude: 'Altitudine Luna',
+            moonIllumination: 'Illuminazione Luna',
+            moonPhase: 'Fase Luna',
+            jetStream: 'Corrente a Getto (250hPa)',
+            seeingEstimate: 'Stima Seeing',
+            highClouds: 'Nuvole Alte',
+            atmosphericConditions: 'Condizioni Atmosferiche',
+            visitRepo: 'Visita Repository',
         },
         pt: {
             excellent: 'EXCELENTE',
@@ -1353,6 +1514,39 @@
             twilightPenalty: 'Penalidade de crepúsculo',
             cloudPenalty: 'Penalidade de nuvens',
             moonPenalty: 'Penalidade da lua',
+            // Diagnostic Labels PT
+            lowClouds: 'Nuvens Baixas',
+            midClouds: 'Nuvens Médias',
+            totalCloudCover: 'Cobertura de Nuvens Total',
+            envConditions: 'Condições Ambientais',
+            temperature: 'Temperatura',
+            dewPoint: 'Ponto de Orvalho',
+            dewPointGap: 'Diferença de Ponto de Orvalho',
+            dewFormationTime: 'Tempo Formação Orvalho',
+            airQualityCAMS: 'Qualidade do Ar (CAMS)',
+            advancedAtmo: 'Atmosfera Avançada',
+            thermalGradient: 'Gradiente Térmico',
+            precipWater: 'Água Precipitável',
+            stabilityIndex: 'Índice de Estabilidade',
+            aod: 'AOD (550nm)',
+            pm25: 'PM2.5',
+            dustMass: 'Massa de Poeira',
+
+            // HTML Help Content
+            aodHelp:
+                '<strong>AOD (550nm):</strong> Profundidade Óptica de Aerossóis. Mede extinção de luz por poeira/neblina. < 0.1 é Excelente.',
+            pm25Help: '<strong>PM2.5:</strong> Partículas finas. Afeta transparência no horizonte.',
+            // New PT Keys
+            sunAltitude: 'Altitude do Sol',
+            twilightPhase: 'Fase Crepuscular',
+            moonAltitude: 'Altitude da Lua',
+            moonIllumination: 'Iluminação da Lua',
+            moonPhase: 'Fase da Lua',
+            jetStream: 'Corrente de Jato (250hPa)',
+            seeingEstimate: 'Estimativa Seeing',
+            highClouds: 'Nuvens Altas',
+            atmosphericConditions: 'Condições Atmosféricas',
+            visitRepo: 'Visitar Repositório',
         },
     };
 
@@ -3237,7 +3431,7 @@
     }
 
     .astro-status {
-        font-size: 14px;
+        font-size: 11px;
         font-weight: bold;
         text-transform: uppercase;
 
